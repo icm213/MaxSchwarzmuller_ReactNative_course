@@ -1,14 +1,16 @@
-import { Alert, View, Button } from "react-native";
+import { Text, Alert, View, Button, Image, StyleSheet } from "react-native";
 import {
   // launchCameraAsync, <= IMPOSSIBLE TO USE AT THIS MOMENT, BCS OF EXPO GO ISSUE (?)
   launchImageLibraryAsync,
   useCameraPermissions,
   PermissionStatus,
 } from "expo-image-picker";
+import { useState } from "react";
 
 function ImagePicker() {
   const [cameraPermissionInformation, requestPermission] =
     useCameraPermissions();
+  const [imageURI, setImageURI] = useState();
 
   async function verifyPermissions() {
     if (verifyPermissions.status === PermissionStatus.UNDETERMINED) {
@@ -28,21 +30,41 @@ function ImagePicker() {
     if (!hasPermission) {
       return;
     }
-    console.log("ddddddddddddddkjjkjjjjjjjjd");
     const image = await launchImageLibraryAsync();
     // ({
     //   allowsEditing: true,
     //   aspect: [16, 9],
     //   quality: 0.5,
     // });
-    console.log("gowwfwef");
+    setImageURI(image.assets[0].uri);
   }
+
+  let imagePreview = <Text style={styles.testText}>No image yet..</Text>;
+
+  if (imageURI) {
+    imagePreview = (
+      <Image style={styles.imagePreview} source={{ uri: imageURI }} />
+    );
+  }
+
   return (
     <View>
-      <View></View>
-      <Button title="take an image" onPress={takeImageHandler}></Button>
+      <View>{imagePreview}</View>
+      <View style={styles.btnContainer}>
+        <Button title="take an image" onPress={takeImageHandler}></Button>
+        <Button onPress={() => setImageURI("")} title="delete image"></Button>
+      </View>
     </View>
   );
 }
 
 export default ImagePicker;
+
+const styles = StyleSheet.create({
+  btnContainer: {
+    padding: 12,
+    gap: 12,
+  },
+  testText: { color: "#fff" },
+  imagePreview: { width: "100%", height: 200 },
+});
