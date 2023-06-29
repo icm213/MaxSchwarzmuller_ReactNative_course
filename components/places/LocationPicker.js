@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View, Text } from "react-native";
+import { Alert, StyleSheet, View, Image, Text } from "react-native";
 import OutlinedButton from "../UI/OutlinedButton";
 import { Colors } from "../../constans/colors";
 import {
@@ -7,8 +7,11 @@ import {
   PermissionStatus,
 } from "expo-location";
 import { useState } from "react";
+import getMapPreview from "../../util/location";
+import { useNavigation } from "@react-navigation/native";
 
 function LocationPicker() {
+  const navigation = useNavigation();
   const [locationPermissionInfo, requestPermission] =
     useForegroundPermissions();
   const [currentLocation, setCurrentLocation] = useState();
@@ -30,15 +33,32 @@ function LocationPicker() {
       return;
     }
     const location = await getCurrentPositionAsync();
-    setCurrentLocation(location);
+    setCurrentLocation({
+      lat: location.coords.latitude,
+      lgn: location.coords.longitude,
+    });
+    console.log(location);
   }
-  function pickOnMapHandler() {}
+  function pickOnMapHandler() {
+    navigation.navigate("Map");
+  }
+
+  let locationPreview = <Text>No location picked</Text>;
+
+  if (currentLocation) {
+    locationPreview = (
+      <Image
+        style={styles.image}
+        source={{
+          uri: getMapPreview(currentLocation.lat, currentLocation.lgn),
+        }}
+      />
+    );
+    console.log(getMapPreview(currentLocation.lat, currentLocation.lgn));
+  }
   return (
     <View style={styles.locationPicker}>
-      <View style={styles.mapPreview}>
-        <Text>latitude: {currentLocation?.coords.latitude}</Text>
-        <Text>longitude: {currentLocation?.coords.longitude}</Text>
-      </View>
+      <View style={styles.mapPreview}>{locationPreview}</View>
       <View style={styles.actions}>
         <OutlinedButton icon="location" onPress={getLocationHander}>
           Locate User
@@ -71,4 +91,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
   },
+  image: { width: "100%", height: "100%", borderRadius: 6 },
 });
