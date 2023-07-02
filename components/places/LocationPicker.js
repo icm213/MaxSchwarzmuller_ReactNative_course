@@ -6,15 +6,36 @@ import {
   useForegroundPermissions,
   PermissionStatus,
 } from "expo-location";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import getMapPreview from "../../util/location";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 
 function LocationPicker() {
+  const [pickedLocation, setPickedLocation] = useState();
+
+  const isFocused = useIsFocused();
+
+  const route = useRoute();
+
+  useEffect(() => {
+    if (isFocused && route.params) {
+      const mapPickedLocation = {
+        lat: route.params.pickedLat,
+        lng: route.params.pickedLng,
+      };
+      console.log("show me: ", mapPickedLocation);
+      setPickedLocation(mapPickedLocation);
+    }
+  }, [isFocused, route]);
+
   const navigation = useNavigation();
   const [locationPermissionInfo, requestPermission] =
     useForegroundPermissions();
-  const [currentLocation, setCurrentLocation] = useState();
+
   async function verifyPermissions() {
     if (locationPermissionInfo.status === PermissionStatus.UNDETERMINED) {
       const permissionResponse = await requestPermission();
@@ -33,11 +54,10 @@ function LocationPicker() {
       return;
     }
     const location = await getCurrentPositionAsync();
-    setCurrentLocation({
+    setPickedLocation({
       lat: location.coords.latitude,
       lgn: location.coords.longitude,
     });
-    console.log(location);
   }
   function pickOnMapHandler() {
     navigation.navigate("Map");
@@ -45,16 +65,19 @@ function LocationPicker() {
 
   let locationPreview = <Text>No location picked</Text>;
 
-  if (currentLocation) {
+  if (pickedLocation) {
     locationPreview = (
       <Image
         style={styles.image}
         source={{
-          uri: getMapPreview(currentLocation.lat, currentLocation.lgn),
+          uri: getMapPreview(pickedLocation.lat, pickedLocation.lgn),
         }}
       />
     );
-    console.log(getMapPreview(currentLocation.lat, currentLocation.lgn));
+    console.log(
+      "map preview: ",
+      getMapPreview(pickedLocation.lat, pickedLocation.lgn)
+    );
   }
   return (
     <View style={styles.locationPicker}>
