@@ -7,14 +7,14 @@ import {
   PermissionStatus,
 } from "expo-location";
 import { useEffect, useState } from "react";
-import getMapPreview from "../../util/location";
+import { getMapPreview, getAdress } from "../../util/location";
 import {
   useIsFocused,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
 
-function LocationPicker() {
+function LocationPicker({ onPickLocation }) {
   const [pickedLocation, setPickedLocation] = useState();
 
   const isFocused = useIsFocused();
@@ -27,10 +27,19 @@ function LocationPicker() {
         lat: route.params.pickedLat,
         lng: route.params.pickedLng,
       };
-      console.log("show me: ", mapPickedLocation);
       setPickedLocation(mapPickedLocation);
     }
   }, [isFocused, route]);
+
+  useEffect(() => {
+    async function locationHandler() {
+      if (pickedLocation) {
+        const address = await getAdress(pickedLocation.lat, pickedLocation.lng);
+        onPickLocation({ ...pickedLocation, address: address });
+      }
+    }
+    locationHandler();
+  }, [pickedLocation, onPickLocation]);
 
   const navigation = useNavigation();
   const [locationPermissionInfo, requestPermission] =
@@ -56,7 +65,7 @@ function LocationPicker() {
     const location = await getCurrentPositionAsync();
     setPickedLocation({
       lat: location.coords.latitude,
-      lgn: location.coords.longitude,
+      lng: location.coords.longitude,
     });
   }
   function pickOnMapHandler() {
@@ -70,13 +79,9 @@ function LocationPicker() {
       <Image
         style={styles.image}
         source={{
-          uri: getMapPreview(pickedLocation.lat, pickedLocation.lgn),
+          uri: getMapPreview(pickedLocation.lat, pickedLocation.lng),
         }}
       />
-    );
-    console.log(
-      "map preview: ",
-      getMapPreview(pickedLocation.lat, pickedLocation.lgn)
     );
   }
   return (

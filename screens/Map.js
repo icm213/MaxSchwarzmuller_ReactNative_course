@@ -15,8 +15,7 @@ function Map({ navigation }) {
   function selectLocationHandler(event) {
     const lat = event.nativeEvent.coordinate.latitude;
     const lng = event.nativeEvent.coordinate.longitude;
-    setSelectedLocation({ lat, lng });
-    console.log("log from map component: ", selectedLocation);
+    setSelectedLocation({ lat: lat, lng: lng });
   }
 
   const savePickedLocationHandler = useCallback(() => {
@@ -26,8 +25,8 @@ function Map({ navigation }) {
     }
 
     navigation.navigate("AddPlace", {
-      pickdeLat: selectedLocation.lat,
-      pickdeLgn: selectedLocation.lgn,
+      pickedLat: selectedLocation.lat,
+      pickedLng: selectedLocation.lng,
     }),
       [navigation, selectedLocation];
   });
