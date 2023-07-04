@@ -2,7 +2,6 @@ import { Pressable, View, StyleSheet, Image, Text } from "react-native";
 import { Colors } from "../../constans/colors";
 
 function PlaceItem({ place, onSelect }) {
-  console.log("THIS IS THE placeItem: ", place.title);
   return (
     <Pressable
       onPress={onSelect}
@@ -24,7 +23,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     borderRadius: 6,
-    marginVertical: 12,
+    margin: 12,
     backgroundColor: Colors.primary500,
   },
   pressed: { opacity: 0.9 },

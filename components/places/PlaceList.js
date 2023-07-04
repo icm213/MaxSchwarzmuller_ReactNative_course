@@ -3,8 +3,6 @@ import { Colors } from "../../constans/colors";
 import PlaceItem from "./PlaceItem";
 
 function PlaceList({ places }) {
-  if (places && places.length !== 0) console.log(places[0].title);
-
   if (!places || places.length === 0) {
     return (
       <View style={styles.fallbackContainer}>
@@ -16,7 +14,7 @@ function PlaceList({ places }) {
     <FlatList
       data={places}
       keyExtractor={(item) => item.id}
-      renderItem={(item) => <PlaceItem place={item} />}
+      renderItem={({ item }) => <PlaceItem place={item} />}
     ></FlatList>
   );
 }
